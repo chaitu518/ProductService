@@ -33,9 +33,6 @@ class ProductServiceApplicationTests {
 		System.out.println(product.getId()+" "+product.getTitle());
 	}
 
-	@Test
-	public void categoryDeleteTest(){
-		//categoryRepository.deleteById(3L);
-	}
+
 
 }
