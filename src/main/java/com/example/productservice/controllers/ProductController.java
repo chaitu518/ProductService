@@ -1,8 +1,10 @@
 package com.example.productservice.controllers;
 
 import com.example.productservice.dtos.ProductDto;
+import com.example.productservice.dtos.ProductRequestDto;
 import com.example.productservice.models.Product;
 import com.example.productservice.services.ProductService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +16,7 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
     ProductService productService;
-    ProductController(ProductService productService) {
+    ProductController(@Qualifier("selfproductservice") ProductService productService) {
         this.productService = productService;
     }
     @GetMapping("/{id}")
@@ -27,8 +29,8 @@ public class ProductController {
         return productService.getProducts();
     }
     @PostMapping("")
-    public ResponseEntity<Product> addProduct(@RequestBody ProductDto productDto){
-        Product product1 = productService.addProduct(productDto);
+    public ResponseEntity<Product> addProduct(@RequestBody ProductRequestDto productRequestDto){
+        Product product1 = productService.addProduct(productRequestDto);
         if(product1 != null){
             return new ResponseEntity<>(product1,HttpStatus.CREATED);
         }
@@ -36,8 +38,8 @@ public class ProductController {
 
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Product> replaceProduct(@PathVariable("id") Long id, @RequestBody ProductDto productDto){
-        Product product = productService.replaceProduct(id,productDto);
+    public ResponseEntity<Product> replaceProduct(@PathVariable("id") Long id, @RequestBody ProductRequestDto productRequestDto){
+        Product product = productService.replaceProduct(id,productRequestDto);
         if(product == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -46,9 +48,9 @@ public class ProductController {
         }
     }
     @PatchMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id,@RequestBody ProductDto productDto){
+    public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id,@RequestBody ProductRequestDto productRequestDto){
 
-        Product product = productService.updateProduct(id,productDto);
+        Product product = productService.updateProduct(id,productRequestDto);
         if(product == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -58,10 +60,7 @@ public class ProductController {
     }
     @DeleteMapping("/{id}")
     public ResponseEntity deleteProduct(@PathVariable("id") Long id){
-        Product product = productService.deleteProduct(id);
-        if(product == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        productService.deleteProduct(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

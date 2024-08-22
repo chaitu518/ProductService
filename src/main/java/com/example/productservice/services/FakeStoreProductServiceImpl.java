@@ -2,8 +2,10 @@ package com.example.productservice.services;
 
 import com.example.productservice.dtos.FakeStoreProductDto;
 import com.example.productservice.dtos.ProductDto;
+import com.example.productservice.dtos.ProductRequestDto;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-@Service
+//@Primary
+@Service("fakestoreproductservice")
 public class FakeStoreProductServiceImpl implements ProductService{
     RestTemplate restTemplate;
     FakeStoreProductServiceImpl(RestTemplate restTemplate) {
@@ -54,14 +57,25 @@ public class FakeStoreProductServiceImpl implements ProductService{
         product.setCategory(category);
         return product;
     }
+    private ProductDto convertProductRequestDtoToProductDto(ProductRequestDto productRequestDto){
+        ProductDto productDto = new ProductDto();
+        productDto.setTitle(productRequestDto.getTitle());
+        productDto.setDescription(productRequestDto.getDescription());
+        productDto.setPrice(productRequestDto.getPrice());
+        productDto.setImage(productRequestDto.getImage());
+        productDto.setCategory(productRequestDto.getCategory().getTitle());
+        return productDto;
+    }
     @Override
-    public Product addProduct(ProductDto productDto) {
+    public Product addProduct(ProductRequestDto productRequestDto) {
+        ProductDto productDto = convertProductRequestDtoToProductDto(productRequestDto);
         FakeStoreProductDto fakeStoreProductDto = restTemplate.postForObject("https://fakestoreapi.com/products", productDto, FakeStoreProductDto.class);
         return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
     }
 
     @Override
-    public Product replaceProduct(Long id, ProductDto productDto) {
+    public Product replaceProduct(Long id, ProductRequestDto productRequestDto) {
+        ProductDto productDto = convertProductRequestDtoToProductDto(productRequestDto);
         RequestCallback requestCallback = restTemplate.httpEntityCallback(productDto, FakeStoreProductDto.class);
         ResponseExtractor<ResponseEntity<FakeStoreProductDto>> responseExtractor = restTemplate.responseEntityExtractor(FakeStoreProductDto.class);
         ResponseEntity<FakeStoreProductDto> response =(restTemplate.execute("https://fakestoreapi.com/products/" + id, HttpMethod.PUT, requestCallback, responseExtractor));
@@ -70,7 +84,8 @@ public class FakeStoreProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Product updateProduct(Long id,ProductDto productDto) {
+    public Product updateProduct(Long id,ProductRequestDto productRequestDto) {
+        ProductDto productDto = convertProductRequestDtoToProductDto(productRequestDto);
         RequestCallback requestCallback = restTemplate.httpEntityCallback(productDto, FakeStoreProductDto.class);
         HttpMessageConverterExtractor<FakeStoreProductDto> responseExtractor = new HttpMessageConverterExtractor<>(FakeStoreProductDto.class,
                 restTemplate.getMessageConverters());
@@ -82,9 +97,9 @@ public class FakeStoreProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Product deleteProduct(Long id) {
+    public void deleteProduct(Long id) {
         RequestCallback requestCallback = restTemplate.acceptHeaderRequestCallback(FakeStoreProductDto.class);
         HttpMessageConverterExtractor<FakeStoreProductDto> responseExtractor = new HttpMessageConverterExtractor(FakeStoreProductDto.class, restTemplate.getMessageConverters());
-        return convertFakeStoreProductDtoToProduct(restTemplate.execute("https://fakestoreapi.com/products/" + id, HttpMethod.DELETE, requestCallback, responseExtractor));
+        convertFakeStoreProductDtoToProduct(restTemplate.execute("https://fakestoreapi.com/products/" + id, HttpMethod.DELETE, requestCallback, responseExtractor));
     }
 }
