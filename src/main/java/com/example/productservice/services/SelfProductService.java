@@ -1,15 +1,17 @@
 package com.example.productservice.services;
 
 import com.example.productservice.dtos.ProductRequestDto;
+import com.example.productservice.exceptions.InvalidProductIdException;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
 import com.example.productservice.repositories.CategoryRepository;
 import com.example.productservice.repositories.ProductRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@Primary
 @Service("selfproductservice")
 public class SelfProductService implements ProductService {
     CategoryRepository categoryRepository;
@@ -28,12 +30,12 @@ public class SelfProductService implements ProductService {
     }
 
     @Override
-    public Product getProductById(Long id) {
+    public Product getProductById(Long id) throws InvalidProductIdException {
         Optional<Product> product = productRepository.findById(id);
         if (product.isPresent()) {
             return product.get();
         }
-        throw new RuntimeException("Product not found");
+        throw new InvalidProductIdException("Product not found");
     }
 
     @Override

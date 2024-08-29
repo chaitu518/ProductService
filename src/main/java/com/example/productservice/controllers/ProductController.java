@@ -1,7 +1,10 @@
 package com.example.productservice.controllers;
 
+import com.example.productservice.dtos.CategoryResponseDto;
 import com.example.productservice.dtos.ProductDto;
 import com.example.productservice.dtos.ProductRequestDto;
+import com.example.productservice.dtos.ProductResponseDto;
+import com.example.productservice.exceptions.InvalidProductIdException;
 import com.example.productservice.models.Product;
 import com.example.productservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,42 +23,103 @@ public class ProductController {
         this.productService = productService;
     }
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable("id") Long id){
-        return productService.getProductById(id);
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable("id") Long id) throws InvalidProductIdException {
+        Product product= productService.getProductById(id);
+            ProductResponseDto responseDto = new ProductResponseDto();
+            CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
+            categoryResponseDto.setId(product.getCategory().getId());
+            categoryResponseDto.setTitle(product.getCategory().getTitle());
+            responseDto.setCategoryResponseDto(categoryResponseDto);
+            responseDto.setTitle(product.getTitle());
+            responseDto.setPrice(product.getPrice());
+            responseDto.setDescription(product.getDescription());
+            responseDto.setId(product.getId());
+            responseDto.setImage(product.getImage());
+            return new ResponseEntity<ProductResponseDto>(responseDto, HttpStatus.OK);
+            //return new ResponseEntity<>(product,HttpStatus.CREATED);
+
     }
     @GetMapping("")
-    public List<Product> getAllProducts(){
+    public ResponseEntity<List<ProductResponseDto>> getAllProducts(){
         //return new ArrayList<Product>();
-        return productService.getProducts();
+        List<Product> products = productService.getProducts();
+        List<ProductResponseDto> productResponseDtos = new ArrayList<>();
+        for (Product product : products) {
+            CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
+            categoryResponseDto.setId(product.getCategory().getId());
+            categoryResponseDto.setTitle(product.getCategory().getTitle());
+            ProductResponseDto productResponseDto = new ProductResponseDto();
+            productResponseDto.setId(product.getId());
+            productResponseDto.setTitle(product.getTitle());
+            productResponseDto.setPrice(product.getPrice());
+            productResponseDto.setDescription(product.getDescription());
+            productResponseDto.setImage(product.getImage());
+            productResponseDto.setCategoryResponseDto(categoryResponseDto);
+            productResponseDtos.add(productResponseDto);
+
+
+        }
+        return new ResponseEntity<List<ProductResponseDto>>(productResponseDtos,HttpStatus.OK);
     }
     @PostMapping("")
-    public ResponseEntity<Product> addProduct(@RequestBody ProductRequestDto productRequestDto){
-        Product product1 = productService.addProduct(productRequestDto);
-        if(product1 != null){
-            return new ResponseEntity<>(product1,HttpStatus.CREATED);
+    public ResponseEntity<ProductResponseDto> addProduct(@RequestBody ProductRequestDto productRequestDto){
+        Product product= productService.addProduct(productRequestDto);
+        if(product != null){
+            ProductResponseDto responseDto = new ProductResponseDto();
+            CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
+            categoryResponseDto.setId(product.getCategory().getId());
+            categoryResponseDto.setTitle(product.getCategory().getTitle());
+            responseDto.setCategoryResponseDto(categoryResponseDto);
+            responseDto.setTitle(product.getTitle());
+            responseDto.setPrice(product.getPrice());
+            responseDto.setDescription(product.getDescription());
+            responseDto.setId(product.getId());
+            responseDto.setImage(product.getImage());
+            return new ResponseEntity<ProductResponseDto>(responseDto, HttpStatus.OK);
+            //return new ResponseEntity<>(product,HttpStatus.CREATED);
         }
         return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
 
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Product> replaceProduct(@PathVariable("id") Long id, @RequestBody ProductRequestDto productRequestDto){
+    public ResponseEntity<ProductResponseDto> replaceProduct(@PathVariable("id") Long id, @RequestBody ProductRequestDto productRequestDto){
         Product product = productService.replaceProduct(id,productRequestDto);
         if(product == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         else {
-            return new ResponseEntity<Product>(product, HttpStatus.OK);
+            ProductResponseDto responseDto = new ProductResponseDto();
+            CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
+            categoryResponseDto.setId(product.getCategory().getId());
+            categoryResponseDto.setTitle(product.getCategory().getTitle());
+            responseDto.setCategoryResponseDto(categoryResponseDto);
+            responseDto.setTitle(product.getTitle());
+            responseDto.setPrice(product.getPrice());
+            responseDto.setDescription(product.getDescription());
+            responseDto.setId(product.getId());
+            responseDto.setImage(product.getImage());
+            return new ResponseEntity<ProductResponseDto>(responseDto, HttpStatus.OK);
         }
     }
     @PatchMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id,@RequestBody ProductRequestDto productRequestDto){
+    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable("id") Long id,@RequestBody ProductRequestDto productRequestDto){
 
         Product product = productService.updateProduct(id,productRequestDto);
         if(product == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         else {
-            return new ResponseEntity<Product>(product, HttpStatus.OK);
+            ProductResponseDto responseDto = new ProductResponseDto();
+            CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
+            categoryResponseDto.setId(product.getCategory().getId());
+            categoryResponseDto.setTitle(product.getCategory().getTitle());
+            responseDto.setCategoryResponseDto(categoryResponseDto);
+            responseDto.setTitle(product.getTitle());
+            responseDto.setPrice(product.getPrice());
+            responseDto.setDescription(product.getDescription());
+            responseDto.setId(product.getId());
+            responseDto.setImage(product.getImage());
+            return new ResponseEntity<ProductResponseDto>(responseDto, HttpStatus.OK);
         }
     }
     @DeleteMapping("/{id}")
