@@ -1,6 +1,8 @@
 package com.example.productservice.services;
 
+import com.example.productservice.commons.AuthenticationCommons;
 import com.example.productservice.dtos.ProductRequestDto;
+import com.example.productservice.dtos.UserDto;
 import com.example.productservice.exceptions.InvalidProductIdException;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
@@ -16,12 +18,21 @@ import java.util.Optional;
 public class SelfProductService implements ProductService {
     CategoryRepository categoryRepository;
     ProductRepository productRepository;
-    public SelfProductService(CategoryRepository categoryRepository, ProductRepository productRepository) {
+    AuthenticationCommons authenticationCommons;
+    public SelfProductService(CategoryRepository categoryRepository, ProductRepository productRepository,AuthenticationCommons commons) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
+        this.authenticationCommons = commons;
     }
+
     @Override
     public List<Product> getProducts() {
+        return List.of();
+    }
+
+    @Override
+    public List<Product> getProducts(String token) {
+        UserDto userDto = authenticationCommons.validateToken(token);
         List<Product> products = productRepository.findAll();
         if (products.isEmpty()) {
             throw new RuntimeException("No products found");

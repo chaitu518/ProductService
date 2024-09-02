@@ -39,10 +39,10 @@ public class ProductController {
             //return new ResponseEntity<>(product,HttpStatus.CREATED);
 
     }
-    @GetMapping("")
-    public ResponseEntity<List<ProductResponseDto>> getAllProducts(){
+    @GetMapping("/all/{token}")
+    public ResponseEntity<List<ProductResponseDto>> getAllProducts(@PathVariable String token) throws InvalidProductIdException {
         //return new ArrayList<Product>();
-        List<Product> products = productService.getProducts();
+        List<Product> products = productService.getProducts(token);
         List<ProductResponseDto> productResponseDtos = new ArrayList<>();
         for (Product product : products) {
             CategoryResponseDto categoryResponseDto = new CategoryResponseDto();

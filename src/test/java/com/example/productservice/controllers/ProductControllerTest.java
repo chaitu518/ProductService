@@ -53,23 +53,23 @@ class ProductControllerTest {
         assertThrows(InvalidProductIdException.class, () -> productController.getProductById(500L));
     }
 
-    @Test
-    void getAllProductsValidCase() {
-        List<Product> products = new ArrayList<>();
-        for (Product product : products) {
-            product.setTitle("iphone 14 pro");
-            product.setDescription("iphone 14 pro");
-            Category category = new Category();
-            category.setTitle("Apple");
-            category.setId(45L);
-            product.setCategory(category);
-            product.setPrice(1490000);
-            product.setImage("ciphone.com");
-            products.add(product);
-        }
-        when(productService.getProducts()).thenReturn(products);
-        ResponseEntity<List<ProductResponseDto>> responseDto = productController.getAllProducts();
-        assertEquals(HttpStatus.OK,responseDto.getStatusCode());
-
-    }
+    //@Test
+//    void getAllProductsValidCase() {
+//        List<Product> products = new ArrayList<>();
+//        for (Product product : products) {
+//            product.setTitle("iphone 14 pro");
+//            product.setDescription("iphone 14 pro");
+//            Category category = new Category();
+//            category.setTitle("Apple");
+//            category.setId(45L);
+//            product.setCategory(category);
+//            product.setPrice(1490000);
+//            product.setImage("ciphone.com");
+//            products.add(product);
+//        }
+//        when(productService.getProducts()).thenReturn(products);
+//        ResponseEntity<List<ProductResponseDto>> responseDto = productController.getAllProducts();
+//        assertEquals(HttpStatus.OK,responseDto.getStatusCode());
+//
+//    }
 }

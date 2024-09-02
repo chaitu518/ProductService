@@ -3,6 +3,7 @@ package com.example.productservice.services;
 import com.example.productservice.dtos.FakeStoreProductDto;
 import com.example.productservice.dtos.ProductDto;
 import com.example.productservice.dtos.ProductRequestDto;
+import com.example.productservice.exceptions.InvalidProductIdException;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
 import org.springframework.context.annotation.Primary;
@@ -35,6 +36,11 @@ public class FakeStoreProductServiceImpl implements ProductService{
             products.add(convertFakeStoreProductDtoToProduct(fakeStoreProductDto));
         }
         return products;
+    }
+
+    @Override
+    public List<Product> getProducts(String token) throws InvalidProductIdException {
+        return List.of();
     }
 
     @Override

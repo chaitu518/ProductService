@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface ProductService {
     public List<Product> getProducts();
+    public List<Product> getProducts(String token) throws InvalidProductIdException;
     public Product getProductById(Long id) throws InvalidProductIdException;
     public Product addProduct(ProductRequestDto productRequestDto);
     public Product replaceProduct(Long id, ProductRequestDto productRequestDto);
