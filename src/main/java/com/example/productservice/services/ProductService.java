@@ -5,11 +5,12 @@ import com.example.productservice.dtos.ProductDto;
 import com.example.productservice.dtos.ProductRequestDto;
 import com.example.productservice.exceptions.InvalidProductIdException;
 import com.example.productservice.models.Product;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface ProductService {
-    public List<Product> getProducts();
+    public Page<Product> getProducts(int pageNumber, int pageSize,String sortDir) throws InvalidProductIdException;
     public List<Product> getProducts(String token) throws InvalidProductIdException;
     public Product getProductById(Long id) throws InvalidProductIdException;
     public Product addProduct(ProductRequestDto productRequestDto);

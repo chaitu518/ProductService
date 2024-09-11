@@ -7,6 +7,8 @@ import com.example.productservice.exceptions.InvalidProductIdException;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ public class FakeStoreProductServiceImpl implements ProductService{
         this.restTemplate=restTemplate;
     }
     @Override
-    public List<Product> getProducts() {
+    public Page<Product> getProducts(int pageNumber, int pageSize,String sortDir) {
         FakeStoreProductDto[] fakeStoreProductDtos=restTemplate.getForObject("https://fakestoreapi.com/products", FakeStoreProductDto[].class);
 
         if(fakeStoreProductDtos==null) {
@@ -35,7 +37,7 @@ public class FakeStoreProductServiceImpl implements ProductService{
         for(FakeStoreProductDto fakeStoreProductDto:fakeStoreProductDtos) {
             products.add(convertFakeStoreProductDtoToProduct(fakeStoreProductDto));
         }
-        return products;
+        return new PageImpl<>(products);
     }
 
     @Override

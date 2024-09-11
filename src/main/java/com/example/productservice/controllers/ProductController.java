@@ -7,7 +7,9 @@ import com.example.productservice.dtos.ProductResponseDto;
 import com.example.productservice.exceptions.InvalidProductIdException;
 import com.example.productservice.models.Product;
 import com.example.productservice.services.ProductService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,9 +41,28 @@ public class ProductController {
             //return new ResponseEntity<>(product,HttpStatus.CREATED);
 
     }
-    @GetMapping("/all/{token}")
-    public ResponseEntity<List<ProductResponseDto>> getAllProducts(@PathVariable String token) throws InvalidProductIdException {
+    //@GetMapping("/all/{token}")
+    @GetMapping("/")
+    public ResponseEntity<Page<Product>> getAllProducts(@RequestParam("pageNumber") int pageNumber,@RequestParam("pageSize") int pageSize,@RequestParam("sortDir") String sortDir) throws InvalidProductIdException {
+        Page<Product> productPage = productService.getProducts(pageNumber,pageSize,sortDir);
+        return new ResponseEntity<>(productPage, HttpStatus.OK);
+
+    }
+    @GetMapping("/all")
+    public ResponseEntity<List<ProductResponseDto>> getAllProducts(HttpServletRequest request) throws InvalidProductIdException {
+        //getting token from header
+        String authorizationHeader = request.getHeader("Authorization");
+
+        // Check if the token is provided and starts with "Bearer "
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Extract the token (remove "Bearer " prefix)
+        String token = authorizationHeader.substring(7);
+
         //return new ArrayList<Product>();
+
         List<Product> products = productService.getProducts(token);
         List<ProductResponseDto> productResponseDtos = new ArrayList<>();
         for (Product product : products) {

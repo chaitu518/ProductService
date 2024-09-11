@@ -12,7 +12,7 @@ public class AuthenticationCommons {
         this.restTemplate = restTemplate;
     }
     public UserDto validateToken(String token) {
-        ResponseEntity<UserDto> response =restTemplate.getForEntity("http://localhost:3030/users/validate/"+token, UserDto.class);
+        ResponseEntity<UserDto> response =restTemplate.getForEntity("http://userservice-env.eu-north-1.elasticbeanstalk.com/users/validate/"+token, UserDto.class);
         if(response.getBody()==null){
             throw new RuntimeException("Invalid Token");
         }
