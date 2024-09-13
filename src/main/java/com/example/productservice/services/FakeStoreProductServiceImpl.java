@@ -9,6 +9,7 @@ import com.example.productservice.models.Product;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,10 @@ import java.util.List;
 @Service("fakestoreproductservice")
 public class FakeStoreProductServiceImpl implements ProductService{
     RestTemplate restTemplate;
-    FakeStoreProductServiceImpl(RestTemplate restTemplate) {
+    RedisTemplate template;
+    FakeStoreProductServiceImpl(RestTemplate restTemplate, RedisTemplate template) {
         this.restTemplate=restTemplate;
+        this.template=template;
     }
     @Override
     public Page<Product> getProducts(int pageNumber, int pageSize,String sortDir) {
@@ -47,11 +50,18 @@ public class FakeStoreProductServiceImpl implements ProductService{
 
     @Override
     public Product getProductById(Long id) {
+        Product product = (Product) template.opsForHash().get("PRODUCTS","PRODUCT_"+id);
+        if(product!=null) {
+            return product;
+        }
         FakeStoreProductDto fakeStoreProductDto = restTemplate.getForObject("https://fakestoreapi.com/products/" + id, FakeStoreProductDto.class);
         if(fakeStoreProductDto==null) {
             return null;
         }
-        return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+
+        Product product1 =  convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+        template.opsForHash().put("PRODUCTS","PRODUCT_"+id,product1);
+        return product1;
     }
     private Product convertFakeStoreProductDtoToProduct(FakeStoreProductDto fakeStoreProductDto) {
         Product product = new Product();

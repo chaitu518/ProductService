@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
     ProductService productService;
-    ProductController(@Qualifier("selfproductservice") ProductService productService) {
+    ProductController(@Qualifier("fakestoreproductservice") ProductService productService) {
         this.productService = productService;
     }
     @GetMapping("/{id}")
