@@ -1,31 +1,44 @@
 package com.example.productservice.services;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.example.productservice.commons.AuthenticationCommons;
+import com.example.productservice.dtos.ProductDocument;
+import com.example.productservice.dtos.ProductDto;
 import com.example.productservice.dtos.ProductRequestDto;
 import com.example.productservice.dtos.UserDto;
 import com.example.productservice.exceptions.InvalidProductIdException;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
 import com.example.productservice.repositories.CategoryRepository;
+import com.example.productservice.repositories.ElasticSearchProductRepository;
 import com.example.productservice.repositories.ProductRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Primary
 @Service("selfproductservice")
 public class SelfProductService implements ProductService {
     CategoryRepository categoryRepository;
     ProductRepository productRepository;
     AuthenticationCommons authenticationCommons;
-    public SelfProductService(CategoryRepository categoryRepository, ProductRepository productRepository,AuthenticationCommons commons) {
+    ElasticSearchProductRepository elasticSearchProductRepository;
+
+    public SelfProductService(CategoryRepository categoryRepository, ProductRepository productRepository,AuthenticationCommons commons,ElasticSearchProductRepository elasticSearchProductRepository) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.authenticationCommons = commons;
+        this.elasticSearchProductRepository = elasticSearchProductRepository;
+
     }
 
     @Override
@@ -87,6 +100,11 @@ public class SelfProductService implements ProductService {
             product.setImage(productRequestDto.getImage());
         }
         Product savedProduct = productRepository.save(product);
+
+        elasticSearchProductRepository.save(convertProductToProductDocument(product));
+
+
+        //System.out.println(elasticSearchProductRepository.findById(savedProduct.getId()));
         return savedProduct;
     }
 
@@ -147,5 +165,36 @@ public class SelfProductService implements ProductService {
         }
         Product updatedProduct = productRepository.save(product);
         return updatedProduct;
+    }
+    public List<ProductDto> searchProductByprefix(String title){
+
+       List<ProductDocument> productDocuments = elasticSearchProductRepository.findByTitleStartingWith(title);
+       if(productDocuments.size()==0){
+           return null;
+       }
+       List<ProductDto> productDtos = new ArrayList<>();
+       for(ProductDocument productDocument : productDocuments){
+           productDtos.add(convertProductDocumentToProductDto(productDocument));
+       }
+       return productDtos;
+    }
+    private ProductDocument convertProductToProductDocument(Product product) {
+        ProductDocument productDocument = new ProductDocument();
+        productDocument.setId(String.valueOf(product.getId()));
+        productDocument.setTitle(product.getTitle());
+        productDocument.setDescription(product.getDescription());
+        productDocument.setPrice(product.getPrice());
+        productDocument.setImage(product.getImage());
+        productDocument.setCategory(product.getCategory().getTitle());
+        return productDocument;
+    }
+    private ProductDto convertProductDocumentToProductDto(ProductDocument productDocument) {
+        ProductDto productDto = new ProductDto();
+        productDto.setCategory(productDocument.getCategory());
+        productDto.setDescription(productDocument.getDescription());
+        productDto.setTitle(productDocument.getTitle());
+        productDto.setPrice(productDocument.getPrice());
+        productDto.setImage(productDocument.getImage());
+        return productDto;
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +22,20 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
     ProductService productService;
-    ProductController(@Qualifier("fakestoreproductservice") ProductService productService) {
+    RestTemplate restTemplate;
+    ProductController(@Qualifier("selfproductservice") ProductService productService,RestTemplate restTemplate) {
         this.productService = productService;
+        this.restTemplate = restTemplate;
+    }
+    @GetMapping("/search/title")
+    public List<ProductDto> getProductsByPrefix(@RequestParam("prefix") String prefix) {
+        return productService.searchProductByprefix(prefix);
     }
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getProductById(@PathVariable("id") Long id) throws InvalidProductIdException {
+        String response = String.valueOf(restTemplate.getForEntity("http://UserService/hello", String.class));
+        System.out.println(response+"------------------------------------------------------------------------------------------------------------------------------------");
+
         Product product= productService.getProductById(id);
             ProductResponseDto responseDto = new ProductResponseDto();
             CategoryResponseDto categoryResponseDto = new CategoryResponseDto();

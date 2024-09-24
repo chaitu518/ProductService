@@ -17,4 +17,5 @@ public interface ProductService {
     public Product replaceProduct(Long id, ProductRequestDto productRequestDto);
     public Product updateProduct(Long id, ProductRequestDto productRequestDto);
     public void deleteProduct(Long id);
+    public List<ProductDto> searchProductByprefix(String title);
 }

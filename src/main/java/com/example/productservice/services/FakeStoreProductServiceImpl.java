@@ -3,6 +3,7 @@ package com.example.productservice.services;
 import com.example.productservice.dtos.FakeStoreProductDto;
 import com.example.productservice.dtos.ProductDto;
 import com.example.productservice.dtos.ProductRequestDto;
+import com.example.productservice.dtos.UserDto;
 import com.example.productservice.exceptions.InvalidProductIdException;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
@@ -61,6 +62,7 @@ public class FakeStoreProductServiceImpl implements ProductService{
 
         Product product1 =  convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
         template.opsForHash().put("PRODUCTS","PRODUCT_"+id,product1);
+        //System.out.println(product1);
         return product1;
     }
     private Product convertFakeStoreProductDtoToProduct(FakeStoreProductDto fakeStoreProductDto) {
@@ -119,5 +121,10 @@ public class FakeStoreProductServiceImpl implements ProductService{
         RequestCallback requestCallback = restTemplate.acceptHeaderRequestCallback(FakeStoreProductDto.class);
         HttpMessageConverterExtractor<FakeStoreProductDto> responseExtractor = new HttpMessageConverterExtractor(FakeStoreProductDto.class, restTemplate.getMessageConverters());
         convertFakeStoreProductDtoToProduct(restTemplate.execute("https://fakestoreapi.com/products/" + id, HttpMethod.DELETE, requestCallback, responseExtractor));
+    }
+
+    @Override
+    public List<ProductDto> searchProductByprefix(String title) {
+        return List.of();
     }
 }
